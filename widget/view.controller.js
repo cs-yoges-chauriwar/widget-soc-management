@@ -9,12 +9,12 @@
 
 (function () {
   angular.module('cybersponse')
-    .controller('socManagement210Ctrl', socManagement210Ctrl);
+    .controller('socManagement211Ctrl', socManagement211Ctrl);
 
-  socManagement210Ctrl.$inject = ['$scope', 'config', '$q', 'Query', '_', 'playbookService', '$filter',
+  socManagement211Ctrl.$inject = ['$scope', 'config', '$q', 'Query', '_', 'playbookService', '$filter',
     'currentDateMinusService', '$rootScope', 'socManagementService', 'ALL_RECORDS_SIZE', '$state', '$window', 'PagedCollection'];
 
-  function socManagement210Ctrl($scope, config, $q, Query, _, playbookService, $filter, currentDateMinusService, $rootScope, socManagementService, ALL_RECORDS_SIZE, $state, $window, PagedCollection) {
+  function socManagement211Ctrl($scope, config, $q, Query, _, playbookService, $filter, currentDateMinusService, $rootScope, socManagementService, ALL_RECORDS_SIZE, $state, $window, PagedCollection) {
     var loadedSVGDocument;
     $scope.percentageData = [];
     var configLoaded = false;
@@ -1307,10 +1307,18 @@
         'modified_before': $filter('date')(_lastToDate, 'yyyy-MM-dd HH:mm:ss', 'UTC')
       };
       var promises = [];
-      promises.push(playbookService.getRunningPlaybooks(_pbRunQuery).then(function (response) {
+      let playbookRunPromise, playbookLastRunPromise;
+      if($rootScope.currentCyopsVersion < '7.6.1'){
+        playbookRunPromise = playbookService.getRunningPlaybooks(_pbRunQuery);
+        playbookLastRunPromise = playbookService.getRunningPlaybooks(_pbLastRunQuery);
+      }else {
+        playbookRunPromise = playbookService.getRunningPlaybooks(_pbRunQuery, 'historical');
+        playbookLastRunPromise = playbookService.getRunningPlaybooks(_pbLastRunQuery, 'historical');
+      }
+      promises.push(playbookRunPromise.then(function (response) {
         $scope.playbookRun = response['hydra:totalItems'];
       }));
-      promises.push(playbookService.getRunningPlaybooks(_pbLastRunQuery).then(function (response) {
+      promises.push(playbookLastRunPromise.then(function (response) {
         $scope.playbookLastRun = response['hydra:totalItems'];
       }));
       $q.all(promises).then(function () {
