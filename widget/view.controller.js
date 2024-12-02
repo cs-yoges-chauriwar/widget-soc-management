@@ -22,6 +22,8 @@
     var fontFamily = '\'Lato\', sans-serif';
     var noRecordStyle = 'margin-top: 10px;margin-left: 15px;color: red;';
     $scope.config.moduleType = $scope.config.moduleType ? $scope.config.moduleType : 'Across Modules';
+    let cyopsVersion = angular.copy($rootScope.currentCyopsVersion);
+    cyopsVersion = parseInt(cyopsVersion.split('.').join(''));
 
     function _init() {
       $scope.currentTheme = $rootScope.theme.id;
@@ -1307,7 +1309,7 @@
       };
       var promises = [];
       let playbookRunPromise, playbookLastRunPromise;
-      if($rootScope.currentCyopsVersion < '7.6.1'){
+      if(cyopsVersion < 761){
         playbookRunPromise = playbookService.getRunningPlaybooks(_pbRunQuery);
         playbookLastRunPromise = playbookService.getRunningPlaybooks(_pbLastRunQuery);
       }else {
