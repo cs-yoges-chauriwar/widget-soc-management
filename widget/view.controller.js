@@ -1320,10 +1320,10 @@
         playbookLastRunPromise = playbookService.getPlaybookExecutionCount(_pbLastRunQuery);
       }
       promises.push(playbookRunPromise.then(function (response) {
-        $scope.playbookRun = response['hydra:totalItems'];
+        $scope.playbookRun = response['hydra:totalItems'] || response;
       }));
       promises.push(playbookLastRunPromise.then(function (response) {
-        $scope.playbookLastRun = response['hydra:totalItems'];
+        $scope.playbookLastRun = response['hydra:totalItems'] || response;
       }));
       $q.all(promises).then(function () {
         calculatePercentage({
