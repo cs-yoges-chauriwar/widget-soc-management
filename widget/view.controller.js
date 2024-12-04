@@ -449,9 +449,10 @@
         queryToGetName.filters = queryToGetName.filters.concat(playbookExcludeTag);
       }
 
-      socManagementService.getPlaybookRun(queryObject).then(function (result) {
+      let supportedVersion = cyopsVersion < 761;
+      socManagementService.getPlaybookRun(queryObject, !supportedVersion).then(function (result) {
         var names = {};
-        socManagementService.getPlaybookRun(queryToGetName).then(function (resultName) {
+        socManagementService.getPlaybookRun(queryToGetName, !supportedVersion).then(function (resultName) {
           socManagementService.getAllPlaybooks(queryObjectTags).then(function (excludePlaybooks) {
             var playboooksToExclude = excludePlaybooks['hydra:member'].map(obj => obj.name).filter(name => name !== undefined);
 
@@ -1297,7 +1298,8 @@
       var _fromDate = currentDateMinusService($scope.config.days);
       var _pbRunQuery = {
         'modified_after': $filter('date')(_fromDate, 'yyyy-MM-dd HH:mm:ss', 'UTC'),
-        'modified_before': $filter('date')(_currentDate, 'yyyy-MM-dd HH:mm:ss', 'UTC')
+        'modified_before': $filter('date')(_currentDate, 'yyyy-MM-dd HH:mm:ss', 'UTC'),
+        'parent__isnull': 'True'
       };
 
       var _lastToDate = currentDateMinusService($scope.config.days);
@@ -1305,7 +1307,8 @@
 
       var _pbLastRunQuery = {
         'modified_after': $filter('date')(_lastFromDate, 'yyyy-MM-dd HH:mm:ss', 'UTC'),
-        'modified_before': $filter('date')(_lastToDate, 'yyyy-MM-dd HH:mm:ss', 'UTC')
+        'modified_before': $filter('date')(_lastToDate, 'yyyy-MM-dd HH:mm:ss', 'UTC'),
+        'parent__isnull': 'True'
       };
       var promises = [];
       let playbookRunPromise, playbookLastRunPromise;
@@ -1313,8 +1316,8 @@
         playbookRunPromise = playbookService.getRunningPlaybooks(_pbRunQuery);
         playbookLastRunPromise = playbookService.getRunningPlaybooks(_pbLastRunQuery);
       }else {
-        playbookRunPromise = playbookService.getRunningPlaybooks(_pbRunQuery, 'historical');
-        playbookLastRunPromise = playbookService.getRunningPlaybooks(_pbLastRunQuery, 'historical');
+        playbookRunPromise = playbookService.getPlaybookExecutionCount(_pbRunQuery);
+        playbookLastRunPromise = playbookService.getPlaybookExecutionCount(_pbLastRunQuery);
       }
       promises.push(playbookRunPromise.then(function (response) {
         $scope.playbookRun = response['hydra:totalItems'];

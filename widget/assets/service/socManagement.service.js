@@ -9,9 +9,9 @@
         .module('cybersponse')
         .factory('socManagementService', socManagementService);
 
-    socManagementService.$inject = ['$q', '$http', 'API', '$resource', 'ALL_RECORDS_SIZE', 'PromiseQueue', 'Modules'];
+    socManagementService.$inject = ['$q', '$http', 'API', '$resource', 'ALL_RECORDS_SIZE', 'PromiseQueue', 'Modules', 'playbookService'];
 
-    function socManagementService($q, $http, API, $resource, ALL_RECORDS_SIZE, PromiseQueue, Modules) {
+    function socManagementService($q, $http, API, $resource, ALL_RECORDS_SIZE, PromiseQueue, Modules, playbookService) {
         var service = {
             getResourceData: getResourceData,
             getPlaybookRun: getPlaybookRun,
@@ -32,14 +32,22 @@
             return defer.promise;
         }
 
-        function getPlaybookRun(queryObject) {
+        function getPlaybookRun(queryObject, supportedVersion) {
             var defer = $q.defer();
-            var url = API.WORKFLOW + 'api/query/workflow_logs/';
-            $resource(url,{}, {}, {stripTrailingSlashes: false}).save(queryObject).$promise.then(function (response) {
-                defer.resolve(response);
-            }, function (error) {
-                defer.reject(error);
-            });
+            if (supportedVersion) {
+                playbookService.getPlaybookLogs(queryObject, {stripTrailingSlashes: false}).then(function (response) {
+                    defer.resolve(response);
+                }, function (error) {
+                    defer.reject(error);
+                });
+            } else {
+                var url = API.WORKFLOW + 'api/query/workflow_logs/';
+                $resource(url,{}, {}, {stripTrailingSlashes: false}).save(queryObject).$promise.then(function (response) {
+                    defer.resolve(response);
+                }, function (error) {
+                    defer.reject(error);
+                });
+            }
             return defer.promise;
         }
 
