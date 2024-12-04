@@ -35,7 +35,12 @@
         function getPlaybookRun(queryObject, supportedVersion) {
             var defer = $q.defer();
             if (supportedVersion) {
-                playbookService.getPlaybookLogs(queryObject, {stripTrailingSlashes: false}).then(function (response) {
+                let urlConfig = {
+                    options: {
+                        stripTrailingSlashes: false
+                    }
+                };
+                playbookService.getPlaybookLogs(queryObject, urlConfig).then(function (response) {
                     defer.resolve(response);
                 }, function (error) {
                     defer.reject(error);
