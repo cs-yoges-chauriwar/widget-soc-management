@@ -450,9 +450,9 @@
       }
 
       let supportedVersion = cyopsVersion < 761;
-      socManagementService.getPlaybookRun(queryObject, supportedVersion).then(function (result) {
+      socManagementService.getPlaybookRun(queryObject, !supportedVersion).then(function (result) {
         var names = {};
-        socManagementService.getPlaybookRun(queryToGetName, supportedVersion).then(function (resultName) {
+        socManagementService.getPlaybookRun(queryToGetName, !supportedVersion).then(function (resultName) {
           socManagementService.getAllPlaybooks(queryObjectTags).then(function (excludePlaybooks) {
             var playboooksToExclude = excludePlaybooks['hydra:member'].map(obj => obj.name).filter(name => name !== undefined);
 
